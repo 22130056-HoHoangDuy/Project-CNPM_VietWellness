@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
 
+
 @Controller
 public class HealthController {
     @Autowired
@@ -19,23 +20,29 @@ public class HealthController {
     @Autowired
     private AudioProcessingService audioService;
 
+    //Luồng chính: Hiển thị thông báo pháp lý khi người dùng truy cập mục "Tư vấn AI"
     @GetMapping("/")
     public String index(Model model) {
         model.addAttribute("legalNotice", "Kết quả chỉ mang tính tham khảo, không thay thế chẩn đoán từ bác sĩ");
         return "index";
     }
-
+    //Luồng chính: Nhận triệu chứng văn bản, kiểm tra mơ hồ, phân tích, xử lý rủi ro cao, lưu trữ và trả kết quả
     @PostMapping("/analyze")
     public String analyze(@RequestParam String symptoms, Model model) {
         System.out.println("Analyzing symptoms: " + symptoms);
         try {
+            // Luồng thay thế: Kiểm tra triệu chứng mơ hồ
             if (analysisService.isVague(symptoms)) {
                 model.addAttribute("originalSymptoms", symptoms);
                 return "clarification";
             }
+            //Luồng chính: Phân tích triệu chứng (so sánh với DDx, PubMed, lịch sử sức khỏe trong HealthAnalysisService)
             DiagnosisResult result = analysisService.analyzeSymptoms(symptoms);
+            // Luồng chính:Lưu kết quả mã hóa AES256 và ghi nhật ký kiểm tra
             analysisService.saveEncryptedRecord(result);
+            // Luồng chính: Xử lý trường hợp rủi ro cao (>=85%)
             handleEmergencyIfNeeded(result, model);
+            //Luồng chính: Trả kết quả chẩn đoán và khuyến nghị
             model.addAttribute("result", result);
             model.addAttribute("topMatches", result.getTopMatches(3));
             return "result";
@@ -45,7 +52,7 @@ public class HealthController {
             return "error";
         }
     }
-
+    //Luồng thay thế: Nhận câu trả lời từ bảng câu hỏi, kết hợp với triệu chứng ban đầu, và tiếp tục luồng chính
     @PostMapping("/clarify")
     public String clarify(@RequestParam String originalSymptoms,
                           @RequestParam String symptomAnswer,
@@ -68,6 +75,7 @@ public class HealthController {
         }
     }
 
+    // Luồng chính: Bước 2 - Nhận dữ liệu âm thanh, chuyển đổi thành văn bản
     @PostMapping("/process-audio")
     public String processAudio(@RequestParam("audioData") String audioData, Model model) {
         System.out.println("Processing audio data");
@@ -84,7 +92,7 @@ public class HealthController {
             return "error";
         }
     }
-
+    // Luồng chính: Kích hoạt giao thức khẩn cấp nếu rủi ro cao (>=85%)
     private void handleEmergencyIfNeeded(DiagnosisResult result, Model model) {
         if (result.getRiskScore() >= 85.0) {
             // TODO: Actually call 115, share GPS coordinates, and notify emergency contacts

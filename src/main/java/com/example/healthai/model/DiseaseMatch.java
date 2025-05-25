@@ -5,6 +5,7 @@ public class DiseaseMatch {
     public final double score;
     public final String treatment;
 
+    // Luồng chính: Lưu trữ thông tin về bệnh khớp với triệu chứng
     public DiseaseMatch(String disease, double score, String treatment) {
         this.disease = disease;
         this.score = score;

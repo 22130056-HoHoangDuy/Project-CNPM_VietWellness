@@ -9,6 +9,7 @@ public class DiagnosisResult {
     private final double riskScore;
     private final String recommendation;
 
+    // Luồng chính: Lưu trữ kết quả chẩn đoán từ phân tích triệu chứng
     public DiagnosisResult(String symptoms, List<DiseaseMatch> matches, double risk, String advice) {
         this.mainSymptoms = symptoms;
         this.matches = matches;

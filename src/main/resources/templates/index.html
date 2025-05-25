@@ -32,7 +32,9 @@
 <body>
 <div class="container mt-5">
     <h1 class="text-center mb-4">AI Tư Vấn Sức Khỏe</h1>
+    <!-- Luồng chính: Hiển thị thông báo pháp lý -->
     <div class="alert alert-info" th:if="${legalNotice}" th:text="${legalNotice}"></div>
+    <!-- Luồng chính: Nhập triệu chứng bằng văn bản -->
     <form id="analyzeForm" action="/analyze" method="post">
         <div class="form-group mb-3">
             <label for="symptoms" class="form-label fw-bold">Triệu chứng:</label>
@@ -40,6 +42,7 @@
         </div>
         <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Phân tích</button>
     </form>
+    <!-- Luồng chính: Ghi âm triệu chứng -->
     <button id="recordButton" class="btn btn-secondary mt-3"><i class="fas fa-microphone"></i> Ghi âm</button>
 </div>
 
@@ -65,6 +68,7 @@
                 reader.readAsDataURL(audioBlob);
                 reader.onloadend = () => {
                     const base64Audio = reader.result.split(',')[1];
+                    // Luồng chính: Gửi dữ liệu âm thanh để chuyển đổi thành văn bản
                     fetch('/process-audio', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

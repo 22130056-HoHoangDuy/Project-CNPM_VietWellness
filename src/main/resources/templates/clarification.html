@@ -28,6 +28,7 @@
 <body>
 <div class="container mt-5">
   <h1 class="text-center mb-4">Làm rõ triệu chứng</h1>
+  <!-- Luồng thay thế: Thu thập dữ liệu làm rõ từ người dùng -->
   <p class="text-muted">Triệu chứng của bạn không đủ rõ ràng. Vui lòng trả lời các câu hỏi sau:</p>
   <form action="/clarify" method="post">
     <input type="hidden" name="originalSymptoms" th:value="${originalSymptoms}">

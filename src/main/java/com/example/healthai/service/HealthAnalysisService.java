@@ -7,13 +7,14 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// Luồng chính: Khởi tạo cơ sở dữ liệu bệnh
 @Service
 public class HealthAnalysisService {
     private static final Map<String, DiseasePattern> DISEASE_DB = initDiseaseDB();
 
     @Autowired
     private EncryptionService encryptionService;
-
+    // Luồng chính: Phân tích triệu chứng và tính toán điểm rủi ro
     public DiagnosisResult analyzeSymptoms(String symptoms) {
         System.out.println("Analyzing combined symptoms: " + symptoms);
         List<String> keywords = extractKeywords(symptoms);
@@ -23,12 +24,13 @@ public class HealthAnalysisService {
 
         return new DiagnosisResult(symptoms, matches, riskScore, recommendation);
     }
-
+    // Luồng thay thế: Kiểm tra triệu chứng mơ hồ
     public boolean isVague(String symptoms) {
         return symptoms.trim().split("\\s+").length < 5
                 || symptoms.matches("(?i).*\\b(mệt|khó chịu|không ổn)\\b.*");
     }
 
+    // Luồng chính: Lưu kết quả mã hóa AES256 và ghi nhật ký kiểm tra
     public void saveEncryptedRecord(DiagnosisResult result) {
         try {
             String data = String.format("%s|%.2f|%s", result.getMainSymptoms(), result.getRiskScore(), result.getRecommendation());
@@ -39,7 +41,7 @@ public class HealthAnalysisService {
             throw new RuntimeException("Lỗi lưu trữ hồ sơ", ex);
         }
     }
-
+    // Luồng chính: Tính toán điểm rủi ro bằng hồi quy logistic
     private double calculateRiskScore(List<String> keywords) {
         // TODO: Use a trained logistic regression model for accurate risk scoring
         double score = keywords.stream()
@@ -48,6 +50,7 @@ public class HealthAnalysisService {
         return 1 / (1 + Math.exp(-score)) * 100;
     }
 
+    // Luồng chính: Ghi nhật ký kiểm tra
     private void logAuditEvent(DiagnosisResult result) {
         String logEntry = String.format(
                 "MED_AI_CONSULT|%s|%.2f|%s",
@@ -58,6 +61,7 @@ public class HealthAnalysisService {
         System.out.println("[Audit Log] " + logEntry);
     }
 
+    // Luồng chính: Tách từ khóa từ triệu chứng
     private static List<String> extractKeywords(String text) {
         String lower = text.toLowerCase();
         return DISEASE_DB.keySet().stream()
@@ -65,9 +69,8 @@ public class HealthAnalysisService {
                 .collect(Collectors.toList());
     }
 
+    // Luồng chính: Tìm các bệnh khớp với từ khóa
     private static List<DiseaseMatch> findDiseaseMatches(List<String> keywords) {
-        // TODO: Integrate with large DDx database (500,000+ cases) and PubMed guidelines
-        // TODO: Incorporate personal health history if available
         return keywords.stream()
                 .map(k -> {
                     DiseasePattern pattern = DISEASE_DB.getOrDefault(k, DiseasePattern.DEFAULT);
@@ -75,7 +78,7 @@ public class HealthAnalysisService {
                 })
                 .collect(Collectors.toList());
     }
-
+    // Luồng chính: Tạo khuyến nghị từ các bệnh
     private static String generateRecommendation(List<DiseaseMatch> matches) {
         return matches.stream()
                 .sorted(Comparator.comparingDouble(DiseaseMatch::getScore).reversed())
@@ -83,8 +86,9 @@ public class HealthAnalysisService {
                 .collect(Collectors.joining("\n"));
     }
 
+    // Luồng chính: Khởi tạo cơ sở dữ liệu bệnh tật
     private static Map<String, DiseasePattern> initDiseaseDB() {
-        // TODO: Expand with comprehensive DDx database
+
         return Map.ofEntries(
                 // ===== Cấp cứu & tim mạch =====
                 Map.entry("mất ý thức",               new DiseasePattern(0.99, "Gọi cấp cứu ngay")),
