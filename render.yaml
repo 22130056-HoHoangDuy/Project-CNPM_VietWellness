@@ -1,9 +1,11 @@
 services:
-  - type: web             # Loại service web
-    name: VietWellness    # Tên service hiển thị trên Render
-    env: java             # Bắt buộc: ép Render dùng Java runtime
-    plan: free            # Chọn gói Free
-    branch: Khiem         # Branch muốn deploy
-    buildCommand: ./mvnw clean package -DskipTests
+  - type: web
+    name: VietWellness-Spring
+    env: java
+    plan: free
+    branch: main
+    # Thêm chmod +x để cấp quyền thực thi cho mvnw
+    buildCommand: |
+      chmod +x mvnw
+      ./mvnw clean package -DskipTests
     startCommand: java -jar target/Project-CNPM_VietWellness-0.0.1-SNAPSHOT.jar
-    # Nếu jar name khác, thay thành đúng tên file trong target/
